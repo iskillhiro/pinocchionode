@@ -1,0 +1,21 @@
+{
+	"name": "pinochhio-node",
+	"version": "1.0.0",
+	"description": "Telegram WebApp",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon app.js"
+	},
+	"author": "Killhiro",
+	"license": "ISC",
+	"dependencies": {
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.5",
+		"express": "^4.19.2",
+		"mongodb": "^6.7.0",
+		"mongoose": "^8.4.4",
+		"node-cron": "^3.0.3",
+		"node-telegram-bot-api": "^0.66.0",
+		"nodemon": "^3.1.4"
+	}
+}
