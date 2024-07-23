@@ -128,7 +128,7 @@ bot.on('message', async msg => {
 					const refUser = await User.findOne({ telegramId: refId })
 					if (refUser) {
 						user.inviter = {
-							inviterId: mongoose.Types.ObjectId(refUser.telegramId),
+							inviterId: refUser.telegramId,
 						}
 						await addReferral(refId, telegramId, username)
 					} else {
