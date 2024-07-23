@@ -17,6 +17,7 @@ app.use('/api', userRoutes)
 
 // Обработчик вебхуков
 app.post('/webhook', (req, res) => {
+	console.log('Webhook received:', req.body) // Логирование для отладки
 	bot.processUpdate(req.body)
 	res.sendStatus(200)
 })
