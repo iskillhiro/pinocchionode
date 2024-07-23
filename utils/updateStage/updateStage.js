@@ -12,11 +12,11 @@ async function updateStageBasedOnCurrency(user) {
 		user.soldo += 1
 		if (user.stage === 1 && user.coinStage !== 4) {
 			user.coinStage += 1
-			sendReferralReward(user, user.inviterId, (soldo = 20000))
+			sendReferralReward(user, user.inviter[0].inviterId, (soldo = 20000))
 		}
 		if (user.stage === 2 && user.coinStage !== 5) {
 			user.coinStage += 1
-			sendReferralReward(user, user.inviterId, (zecchino = 20000))
+			sendReferralReward(user, user.inviter[0].inviterId, (zecchino = 20000))
 		}
 		if (user.stage === 1 && user.coinStage + 1 > 4) {
 			user.stage += 1

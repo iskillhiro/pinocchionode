@@ -126,9 +126,9 @@ bot.on('message', async msg => {
 				if (refId && refId !== telegramId) {
 					const refUser = await User.findOne({ telegramId: refId })
 					if (refUser) {
-						user.inviter = {
-							inviterId: refUser.telegramId,
-						}
+						user.inviter.push({
+							inviterId: refId,
+						})
 						await addReferral(refId, telegramId, username)
 					} else {
 						console.log('Referral user not found:', refId)

@@ -121,8 +121,7 @@ const TreeCoinBoosts = new mongoose.Schema({
 })
 const InviterSchema = new mongoose.Schema({
 	inviterId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		type: String,
 		default: null,
 	},
 })
@@ -142,7 +141,7 @@ const UserSchema = new mongoose.Schema({
 	boosts: [UserBoostSchema],
 	upgradeBoosts: [UpgradeBoosts],
 	treeCoinBoosts: [TreeCoinBoosts],
-	inviter: InviterSchema,
+	inviter: [InviterSchema],
 	referrals: [ReferralSchema],
 	createdAt: { type: Date, default: Date.now },
 })
