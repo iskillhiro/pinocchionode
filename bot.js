@@ -7,10 +7,10 @@ const bot = new TelegramBot(process.env.TOKEN)
 const setWebhook = async () => {
 	const url = 'https://pinocchionode-backend.onrender.com/webhook'
 	try {
-		await bot.setWebHook(url)
-		console.log(`Webhook set to ${url}`)
-	} catch (error) {
-		console.error('Error setting webhook:', error)
+		const res = await bot.setWebHook(url)
+		console.log(`Webhook set to ${url}`, res)
+	} catch (err) {
+		console.error('Error setting webhook:', err)
 	}
 }
 

@@ -17,7 +17,7 @@ app.use('/api', userRoutes)
 
 // Обработчик вебхуков
 app.post('/webhook', (req, res) => {
-	console.log('Webhook received:', req.body) // Логирование для отладки
+	console.log('Webhook received:', req.body) // Логирование входящих данных вебхука
 	bot.processUpdate(req.body)
 	res.sendStatus(200)
 })
@@ -28,5 +28,5 @@ require('./utils/checkActiveBoost/checkActiveBoost.js')
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () =>
-	console.log(`Server started successful🚀 on port ${PORT}`)
+	console.log(`Server started successfully 🚀 on port ${PORT}`)
 )

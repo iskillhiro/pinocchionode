@@ -5,11 +5,11 @@ const path = require('path')
 const fs = require('fs')
 
 bot.on('message', async msg => {
+	console.log('Received message:', msg) // Логирование входящего сообщения
+
 	const chatId = msg.chat.id
 	const telegramId = String(chatId)
 	let refId = null // автор ссылки
-
-	console.log('Received message:', msg) // Логирование входящего сообщения
 
 	if (msg.text && msg.text.startsWith('/start')) {
 		const startParam = msg.text.split(' ')[1]
