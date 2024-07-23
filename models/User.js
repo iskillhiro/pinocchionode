@@ -1,6 +1,43 @@
-const mongoose = require('mongoose')
+const { default: mongoose } = require('mongoose')
 
-const referralSchema = new mongoose.Schema({
+const TaskSchema = new mongoose.Schema({
+	taskType: {
+		type: String, // YT, TG, GAME
+		required: true,
+	},
+	title: {
+		type: String,
+		required: true,
+	},
+	reward: {
+		type: Number,
+		required: true,
+	},
+	iconSrc: {
+		type: String,
+		default: null,
+	},
+	link: {
+		type: String,
+		default: null,
+	},
+	isComplete: {
+		type: Boolean,
+		default: false,
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now,
+	},
+})
+const TaskBlockSchema = new mongoose.Schema({
+	tasksBlock: [TaskSchema],
+})
+const ReferralSchema = new mongoose.Schema({
+	user_id: {
+		type: String,
+		required: true,
+	},
 	username: {
 		type: String,
 		required: true,
@@ -9,52 +46,90 @@ const referralSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
-	telegramId: {
-		type: String,
-		required: true,
-		unique: true,
-	},
 })
 
-const userSchema = new mongoose.Schema({
-	telegramId: {
+const UserBoostSchema = new mongoose.Schema({
+	name: { type: String, required: true },
+	icon: { type: String, required: true },
+	startTime: { type: Date, default: null },
+	endTime: { type: Date, default: null },
+	lastUsed: { type: Date, default: null },
+	level: { type: Number, default: 1 },
+	usesToday: { type: Number, default: 0 },
+	boostType: {
 		type: String,
 		required: true,
-		unique: true,
 	},
-	username: {
+	lastUsedDate: { type: Date, default: null },
+})
+const UpgradeBoosts = new mongoose.Schema({
+	name: {
 		type: String,
-		required: true,
 	},
-	stage: {
+	icon: {
+		type: String,
+	},
+	boostType: {
+		type: String,
+		default: 'upgradable', // upgradable, one-time
+	},
+	level: {
 		type: Number,
 		default: 1,
 	},
-	coins: {
+	maxLevel: {
 		type: Number,
-		default: 0,
+		default: 2,
 	},
-	soldo: {
-		type: Number,
-		default: 0,
-	},
-	zecchino: {
-		type: Number,
-		default: 0,
-	},
-	energy: {
-		type: Number,
-		default: 100,
-	},
-	maxEnergy: {
-		type: Number,
-		default: 100,
-	},
-	referrals: [referralSchema],
-	createdAt: {
-		type: Date,
-		default: Date.now,
+	currency: {
+		type: String,
+		required: true,
 	},
 })
-const User = mongoose.model('User', userSchema)
+
+const TreeCoinBoosts = new mongoose.Schema({
+	name: {
+		type: String,
+	},
+	icon: {
+		type: String,
+	},
+	status: {
+		type: Boolean,
+		default: false,
+	},
+	startTime: {
+		type: Date,
+		default: null,
+	},
+	endTime: {
+		type: Date,
+		default: null,
+	},
+	currency: {
+		type: String,
+		required: true,
+	},
+})
+const UserSchema = new mongoose.Schema({
+	telegramId: { type: String, required: true, unique: true },
+	username: { type: String, required: true },
+	stage: { type: Number, default: 1 },
+	coinStage: { type: Number, default: 0 },
+	coins: { type: Number, default: 0 },
+	soldoTaps: { type: Number, default: 0 },
+	soldo: { type: Number, default: 0 },
+	zecchinoTaps: { type: Number, default: 0 },
+	zecchino: { type: Number, default: 0 },
+	energy: { type: Number, default: 100 },
+	maxEnergy: { type: Number, default: 100 },
+	tasks: [TaskBlockSchema],
+	boosts: [UserBoostSchema],
+	upgradeBoosts: [UpgradeBoosts],
+	treeCoinBoosts: [TreeCoinBoosts],
+	referrals: [ReferralSchema],
+	createdAt: { type: Date, default: Date.now },
+})
+
+const User = mongoose.model('User', UserSchema)
 module.exports = User
