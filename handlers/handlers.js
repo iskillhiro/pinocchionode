@@ -1,12 +1,8 @@
-const TelegramBot = require('node-telegram-bot-api')
-const dotenv = require('dotenv')
 const User = require('../models/User')
 const { addReferral } = require('../utils/addReferral/addReferral')
 const bot = require('../bot')
 const path = require('path')
 const fs = require('fs')
-
-dotenv.config()
 
 bot.on('message', async msg => {
 	const chatId = msg.chat.id
