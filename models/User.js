@@ -120,8 +120,13 @@ const TreeCoinBoosts = new mongoose.Schema({
 	},
 })
 const InviterSchema = new mongoose.Schema({
-	inviterId: { type: String, default: null },
+	inviterId: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+		default: null,
+	},
 })
+
 const UserSchema = new mongoose.Schema({
 	telegramId: { type: String, required: true, unique: true },
 	username: { type: String, required: true },
@@ -136,9 +141,9 @@ const UserSchema = new mongoose.Schema({
 	maxEnergy: { type: Number, default: 100 },
 	tasks: [TaskBlockSchema],
 	boosts: [UserBoostSchema],
-	upgradeBoosts: [UpgradeBoosts],
-	treeCoinBoosts: [TreeCoinBoosts],
-	inviter: [InviterSchema],
+	upgradeBoosts: [UpgradeBoostSchema],
+	treeCoinBoosts: [TreeCoinBoostSchema],
+	inviter: InviterSchema, // changed from an array to a single object
 	referrals: [ReferralSchema],
 	createdAt: { type: Date, default: Date.now },
 })
