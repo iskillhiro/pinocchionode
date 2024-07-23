@@ -9,6 +9,8 @@ bot.on('message', async msg => {
 	const telegramId = String(chatId)
 	let refId = null // автор ссылки
 
+	console.log('Received message:', msg) // Логирование входящего сообщения
+
 	if (msg.text && msg.text.startsWith('/start')) {
 		const startParam = msg.text.split(' ')[1]
 		if (startParam) {
@@ -18,6 +20,7 @@ bot.on('message', async msg => {
 
 		try {
 			let user = await User.findOne({ telegramId })
+			console.log('User found:', user) // Логирование найденного пользователя
 
 			if (!user) {
 				// Примерные данные задач
