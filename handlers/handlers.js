@@ -3,6 +3,7 @@ const { addReferral } = require('../utils/addReferral/addReferral')
 const bot = require('../bot')
 const path = require('path')
 const fs = require('fs')
+const { default: mongoose } = require('mongoose')
 
 bot.on('message', async msg => {
 	console.log('Received message:', msg) // Логирование входящего сообщения
