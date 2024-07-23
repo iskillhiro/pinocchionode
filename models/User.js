@@ -126,7 +126,6 @@ const InviterSchema = new mongoose.Schema({
 		default: null,
 	},
 })
-
 const UserSchema = new mongoose.Schema({
 	telegramId: { type: String, required: true, unique: true },
 	username: { type: String, required: true },
@@ -141,9 +140,9 @@ const UserSchema = new mongoose.Schema({
 	maxEnergy: { type: Number, default: 100 },
 	tasks: [TaskBlockSchema],
 	boosts: [UserBoostSchema],
-	upgradeBoosts: [UpgradeBoostSchema],
-	treeCoinBoosts: [TreeCoinBoostSchema],
-	inviter: InviterSchema, // changed from an array to a single object
+	upgradeBoosts: [UpgradeBoosts],
+	treeCoinBoosts: [TreeCoinBoosts],
+	inviter: InviterSchema,
 	referrals: [ReferralSchema],
 	createdAt: { type: Date, default: Date.now },
 })
