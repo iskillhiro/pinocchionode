@@ -127,6 +127,7 @@ const UserSchema = new mongoose.Schema({
 	boosts: [UserBoostSchema],
 	upgradeBoosts: [UpgradeBoosts],
 	treeCoinBoosts: [TreeCoinBoosts],
+	inviter: { type: String, default: null },
 	referrals: [ReferralSchema],
 	createdAt: { type: Date, default: Date.now },
 })

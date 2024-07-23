@@ -127,21 +127,20 @@ bot.on('message', async msg => {
 					treeCoinBoosts: treeCoinBoosts,
 					upgradeBoosts: upgradeBoosts,
 				})
-
+				// Добавление реферала, если refId передан
+				if (refId && refId !== telegramId) {
+					const refUser = await User.findOne({ telegramId: refId })
+					if (refUser) {
+						user.inviter = refId
+						await addReferral(refId, telegramId, username)
+					} else {
+						console.log('Referral user not found:', refId)
+					}
+				}
 				await user.save()
 				console.log('User saved:', user)
 			} else {
 				console.log('User already exists:', user)
-			}
-
-			// Добавление реферала, если refId передан
-			if (refId && refId !== telegramId) {
-				const refUser = await User.findOne({ telegramId: refId })
-				if (refUser) {
-					await addReferral(refId, telegramId, username)
-				} else {
-					console.log('Referral user not found:', refId)
-				}
 			}
 		} catch (err) {
 			console.error('Error saving user:', err)
