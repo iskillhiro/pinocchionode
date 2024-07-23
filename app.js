@@ -23,7 +23,7 @@ app.post('/webhook', (req, res) => {
 })
 
 // Подключение обработчиков сообщений
-require('./handlers') // Убедитесь, что обработчики подключены
+require('./handlers/handlers.js') // Убедитесь, что обработчики подключены
 
 require('./utils/energyRegen/energyRegen.js')
 require('./utils/checkActiveBoost/checkActiveBoost.js')
