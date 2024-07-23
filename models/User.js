@@ -42,7 +42,15 @@ const ReferralSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	money_count: {
+	soldo_count: {
+		type: Number,
+		default: 0,
+	},
+	zecchino_count: {
+		type: Number,
+		default: 0,
+	},
+	coin_count: {
 		type: Number,
 		default: 0,
 	},
@@ -111,6 +119,9 @@ const TreeCoinBoosts = new mongoose.Schema({
 		required: true,
 	},
 })
+const InviterSchema = new mongoose.Schema({
+	inviterId: { type: String, default: null },
+})
 const UserSchema = new mongoose.Schema({
 	telegramId: { type: String, required: true, unique: true },
 	username: { type: String, required: true },
@@ -127,7 +138,7 @@ const UserSchema = new mongoose.Schema({
 	boosts: [UserBoostSchema],
 	upgradeBoosts: [UpgradeBoosts],
 	treeCoinBoosts: [TreeCoinBoosts],
-	inviter: { type: String, default: null },
+	inviter: [InviterSchema],
 	referrals: [ReferralSchema],
 	createdAt: { type: Date, default: Date.now },
 })

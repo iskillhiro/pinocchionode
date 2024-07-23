@@ -1,32 +1,57 @@
 const User = require('../../models/User')
 
-const sendReferralReward = (
+const sendReferralReward = async (
 	telegramId,
+	inviterId,
 	soldo = null,
 	zecchino = null,
 	coins = null
 ) => {
-	const user = User.findOne({ telegramId })
+	try {
+		// Найти пользователя
+		const user = await User.findOne({ telegramId })
 
-	if (user) {
-		if (user.referrals.length > 0) {
-			user.referrals.foreach(referral => {
-				const referralUser = User.findOne({ telegramId: referral })
-				if (referralUser) {
-					if (soldo !== null) {
-						referralUser.soldoTaps += soldo
-					}
-					if (zecchino !== null) {
-						referralUser.zecchinoTaps += zecchino
-					}
-					if (coins !== null) {
-						referralUser.coins += coins
+		if (user) {
+			// Найти пользователя, который пригласил
+			const inviterUser = await User.findOne({ telegramId: inviterId })
+
+			if (inviterUser) {
+				if (soldo !== null) {
+					inviterUser.soldoTaps += soldo
+					const referralUser = inviterUser.referrals.find(
+						referral => referral.user_id === user.telegramId
+					)
+
+					if (referralUser) {
+						referralUser.soldo_count += soldo
 					}
 				}
-			})
-		} else {
-			console.log('List of referrals is empty')
+				if (zecchino !== null) {
+					inviterUser.zecchinoTaps += zecchino
+					const referralUser = inviterUser.referrals.find(
+						referral => referral.user_id === user.telegramId
+					)
+
+					if (referralUser) {
+						referralUser.zecchino_count += zecchino
+					}
+				}
+				if (coins !== null) {
+					inviterUser.coins += coins
+					const referralUser = inviterUser.referrals.find(
+						referral => referral.user_id === user.telegramId
+					)
+
+					if (referralUser) {
+						referralUser.coin_count += coins
+					}
+				}
+
+				await inviterUser.save() // Сохранить изменения в базе данных
+			}
 		}
+	} catch (error) {
+		console.error('Error in sendReferralReward:', error)
 	}
 }
 
