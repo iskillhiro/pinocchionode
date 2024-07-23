@@ -9,12 +9,14 @@ bot.on('message', async msg => {
 
 	const chatId = msg.chat.id
 	const telegramId = String(chatId)
-	let refId = null // автор ссылки
+	let refId = null
 
 	if (msg.text && msg.text.startsWith('/start')) {
+		console.log('Processing /start command') // Логирование команды /start
+
 		const startParam = msg.text.split(' ')[1]
 		if (startParam) {
-			refId = startParam // user_id из реферальной ссылки
+			refId = startParam
 		}
 		const username = msg.chat.username || 'unknown'
 
@@ -23,7 +25,6 @@ bot.on('message', async msg => {
 			console.log('User found:', user) // Логирование найденного пользователя
 
 			if (!user) {
-				// Примерные данные задач
 				const defaultTasks = [
 					{
 						taskType: 'YT',
@@ -49,17 +50,10 @@ bot.on('message', async msg => {
 				]
 
 				const defaultBoosts = [
-					{
-						name: 'energy',
-						icon: 'lightning.svg',
-						boostType: 'daily',
-					},
-					{
-						name: 'turbo',
-						icon: 'silver.svg',
-						boostType: 'daily',
-					},
+					{ name: 'energy', icon: 'lightning.svg', boostType: 'daily' },
+					{ name: 'turbo', icon: 'silver.svg', boostType: 'daily' },
 				]
+
 				const upgradeBoosts = [
 					{
 						name: 'energy',
@@ -96,6 +90,7 @@ bot.on('message', async msg => {
 						currency: 'soldo',
 					},
 				]
+
 				const treeCoinBoosts = [
 					{
 						name: 'shovel',
@@ -116,17 +111,18 @@ bot.on('message', async msg => {
 						currency: 'zecchino',
 					},
 				]
-				const taskBlock = { tasksBlock: defaultTasks } // Create task block
+
+				const taskBlock = { tasksBlock: defaultTasks }
 
 				user = new User({
 					telegramId,
 					username,
-					tasks: [taskBlock], // Save task block to user
+					tasks: [taskBlock],
 					boosts: defaultBoosts,
 					treeCoinBoosts: treeCoinBoosts,
 					upgradeBoosts: upgradeBoosts,
 				})
-				// Добавление реферала, если refId передан
+
 				if (refId && refId !== telegramId) {
 					const refUser = await User.findOne({ telegramId: refId })
 					if (refUser) {
@@ -136,6 +132,7 @@ bot.on('message', async msg => {
 						console.log('Referral user not found:', refId)
 					}
 				}
+
 				await user.save()
 				console.log('User saved:', user)
 			} else {
@@ -162,13 +159,11 @@ bot.on('message', async msg => {
 
 		const photoPath = path.join(__dirname, '..', 'static', 'start-image.png')
 
-		// Check if the file exists
 		if (!fs.existsSync(photoPath)) {
 			console.error('File not found:', photoPath)
 			return
 		}
 
-		// Check the file format
 		const fileExtension = path.extname(photoPath).toLowerCase()
 		const validExtensions = ['.jpg', '.jpeg', '.png']
 		if (!validExtensions.includes(fileExtension)) {

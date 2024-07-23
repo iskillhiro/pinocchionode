@@ -17,10 +17,13 @@ app.use('/api', userRoutes)
 
 // Обработчик вебхуков
 app.post('/webhook', (req, res) => {
-	console.log('Webhook received:', req.body) // Логирование входящих данных вебхука
+	console.log('Webhook received:', req.body) // Логирование запроса вебхука
 	bot.processUpdate(req.body)
 	res.sendStatus(200)
 })
+
+// Подключение обработчиков сообщений
+require('./handlers') // Убедитесь, что обработчики подключены
 
 require('./utils/energyRegen/energyRegen.js')
 require('./utils/checkActiveBoost/checkActiveBoost.js')
@@ -28,5 +31,5 @@ require('./utils/checkActiveBoost/checkActiveBoost.js')
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () =>
-	console.log(`Server started successfully 🚀 on port ${PORT}`)
+	console.log(`Server started successful🚀 on port ${PORT}`)
 )
