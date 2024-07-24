@@ -9,7 +9,7 @@ const bot = require('../../bot') // Инициализированный бот
 async function updateStageBasedOnCurrency(user) {
 	let hasChanges = false
 
-	if (user.soldoTaps >= 1000000) {
+	if (user.soldoTaps > 1000000) {
 		user.soldoTaps -= 1000000
 		user.soldo += 1
 
@@ -62,7 +62,7 @@ async function updateStageBasedOnCurrency(user) {
 		hasChanges = true
 	}
 
-	if (user.zecchinoTaps >= 1000000) {
+	if (user.zecchinoTaps > 1000000) {
 		user.zecchinoTaps -= 1000000
 		user.soldo += 1
 		hasChanges = true
@@ -70,7 +70,7 @@ async function updateStageBasedOnCurrency(user) {
 
 	if (hasChanges) {
 		await user.save()
-		console.log(`User changes saved: ${user}`)
+		console.log(`User changes saved: ${user.telegramId}`)
 	}
 }
 
