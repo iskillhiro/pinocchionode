@@ -1,16 +1,15 @@
 const User = require('../../models/User')
 
 const sendReferralReward = async (
-	telegramId,
+	user,
 	inviterId,
 	soldo = null,
 	zecchino = null,
 	coins = null
 ) => {
 	try {
+		console.log(`inviterId: ${inviterId}`)
 		// Найти пользователя
-		const user = await User.findOne({ telegramId })
-
 		if (user) {
 			// Найти пользователя, который пригласил
 			const inviterUser = await User.findOne({ telegramId: inviterId })

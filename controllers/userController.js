@@ -33,6 +33,7 @@ const updateUser = async (req, res) => {
 			} else {
 				user.soldoTaps = soldoTaps
 			}
+			updateStageBasedOnCurrency(user)
 		}
 
 		if (zecchinoTaps !== undefined) {
@@ -45,12 +46,12 @@ const updateUser = async (req, res) => {
 			} else {
 				user.zecchinoTaps = soldoTaps
 			}
+			updateStageBasedOnCurrency(user)
 		}
 
 		if (energy !== undefined) {
 			user.energy = energy
 		}
-		updateStageBasedOnCurrency(user)
 		await user.save()
 
 		res.json(user)
