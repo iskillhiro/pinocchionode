@@ -31,7 +31,7 @@ const updateUser = async (req, res) => {
 			) {
 				user.soldoTaps += user.upgradeBoosts[2].level * 10
 			} else {
-				user.soldoTaps = user
+				user.soldoTaps += touches * user.upgradeBoosts[2].level
 			}
 			updateStageBasedOnCurrency(user)
 		}
@@ -44,12 +44,13 @@ const updateUser = async (req, res) => {
 			) {
 				user.zecchinoTaps += user.upgradeBoosts[2].level * 10
 			} else {
-				user.zecchinoTaps = soldoTaps
+				user.zecchinoTaps += touches * user.upgradeBoosts[2].level
 			}
 			updateStageBasedOnCurrency(user)
 		}
 
 		user.energy -= touches * user.upgradeBoosts[2].level
+		console.log(user.upgradeBoosts[2].level)
 		await user.save()
 
 		res.json(user)

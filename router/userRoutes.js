@@ -11,6 +11,11 @@ const {
 	upgradeBoost,
 	activateTreeBoost,
 } = require('../controllers/boostController')
+const {
+	plantCoin,
+	startLanding,
+	claim,
+} = require('../controllers/treeController')
 
 router.get('/user/:telegramId', getUser)
 router.put('/user/update', updateUser)
@@ -25,4 +30,9 @@ router
 
 router.put('/upgradeBoost/:telegramId/:boostName', upgradeBoost)
 router.put('/treeBoost/:telegramId/:boostName', activateTreeBoost)
+
+router
+	.post('/tree/plant', plantCoin)
+	.put('/tree/start', startLanding)
+	.get('/tree/claim/:telegramId', claim)
 module.exports = router

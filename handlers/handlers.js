@@ -121,6 +121,13 @@ bot.on('message', async msg => {
 					boosts: defaultBoosts,
 					treeCoinBoosts: treeCoinBoosts,
 					upgradeBoosts: upgradeBoosts,
+					tree: {
+						isActive: false,
+						coinPlanted: 0,
+						lootBalance: 0,
+						landingStartDate: null,
+						landingEndDate: null,
+					},
 				})
 
 				if (refId && refId !== telegramId) {

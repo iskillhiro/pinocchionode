@@ -5,61 +5,56 @@ const {
 } = require('../sendReferralReward/sendReferralReward')
 const bot = require('../../bot') // Инициализированный бот
 
-// TODO: Исправить - когда пользователь в начале получает первый миллион - поднимается сразу 2 уровня coinStage
 async function updateStageBasedOnCurrency(user) {
 	let hasChanges = false
 
-	if (user.soldoTaps > 1000000) {
-		user.soldoTaps -= 1000000
-		user.soldo += 1
+	const processStage = (
+		currentStage,
+		coinType,
+		rewardAmount,
+		nextStageCoinStage
+	) => {
+		const inviterId = user.inviter[0]?.inviterId
 
-		// Проверка на этап 1
-		if (user.stage === 1) {
-			if (user.coinStage !== 4) {
-				user.coinStage += 1
-				console.log(
-					`Stage 1, CoinStage: ${user.coinStage}. Sending 20000 Soldo as reward.`
-				)
-
-				sendReferralReward(user, user.inviter[0].inviterId, 20000) // отправить солдо
-
-				// Отправка сообщения инвайтеру
-				const inviterId = user.inviter[0]?.inviterId
-				if (inviterId) {
-					const message = `Ваш реферал ${user.username} достиг нового уровня: CoinStage ${user.coinStage}. Вы получаете 20000 Soldo!`
-					bot.sendMessage(inviterId, message)
-				} else {
-					console.warn('Инвайтер не найден или не указан.')
-				}
-			}
-
-			if (user.coinStage >= 4) {
-				user.stage += 1
-				user.coinStage = 0 // сброс стадии
-				console.log(`Stage 1 complete. Moving to stage 2.`)
-			}
-		}
-
-		// Проверка на этап 2
-		else if (user.stage === 2 && user.coinStage !== 5) {
+		if (user.coinStage !== nextStageCoinStage) {
 			user.coinStage += 1
 			console.log(
-				`Stage 2, CoinStage: ${user.coinStage}. Sending 20000 Zecchino as reward.`
+				`Stage ${currentStage}, CoinStage: ${user.coinStage}. Sending ${rewardAmount} ${coinType} as reward.`
 			)
 
-			sendReferralReward(user, user.inviter[0].inviterId, null, 20000) // отправить зекчино
-
-			// Отправка сообщения инвайтеру
-			const inviterId = user.inviter[0]?.inviterId
 			if (inviterId) {
-				const message = `Ваш реферал ${user.username} достиг нового уровня: CoinStage ${user.coinStage}. Вы получаете 20000 Zecchino!`
+				sendReferralReward(
+					user,
+					inviterId,
+					coinType === 'Soldo' ? rewardAmount : null,
+					coinType === 'Zecchino' ? rewardAmount : null
+				)
+				const message = `Ваш реферал ${user.username} достиг нового уровня: CoinStage ${user.coinStage}. Вы получаете ${rewardAmount} ${coinType}!`
 				bot.sendMessage(inviterId, message)
 			} else {
 				console.warn('Инвайтер не найден или не указан.')
 			}
 		}
 
+		if (user.coinStage >= nextStageCoinStage) {
+			user.stage += 1
+			user.coinStage = 0 // сброс стадии
+			console.log(
+				`Stage ${currentStage} complete. Moving to stage ${currentStage + 1}.`
+			)
+		}
+	}
+
+	if (user.soldoTaps > 1000000) {
+		user.soldoTaps -= 1000000
+		user.soldo += 1
 		hasChanges = true
+
+		if (user.stage === 1) {
+			processStage(1, 'Soldo', 20000, 4)
+		} else if (user.stage === 2) {
+			processStage(2, 'Zecchino', 20000, 5)
+		}
 	}
 
 	if (user.zecchinoTaps > 1000000) {

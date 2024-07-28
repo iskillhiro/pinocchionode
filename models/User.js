@@ -119,6 +119,14 @@ const TreeCoinBoosts = new mongoose.Schema({
 		required: true,
 	},
 })
+const TreeSchema = new mongoose.Schema({
+	isActive: { type: Boolean, default: false },
+	coinPlanted: { type: Number, default: 0 },
+	lootBalance: { type: Number, default: 0 },
+	lastGettingLoot: { type: Date, default: null },
+	landingStartDate: { type: Date, default: null },
+	landingEndDate: { type: Date, default: null },
+})
 const InviterSchema = new mongoose.Schema({
 	inviterId: {
 		type: String,
@@ -140,6 +148,7 @@ const UserSchema = new mongoose.Schema({
 	tasks: [TaskBlockSchema],
 	boosts: [UserBoostSchema],
 	upgradeBoosts: [UpgradeBoosts],
+	tree: TreeSchema,
 	treeCoinBoosts: [TreeCoinBoosts],
 	inviter: [InviterSchema],
 	referrals: [ReferralSchema],

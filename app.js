@@ -22,11 +22,10 @@ app.post('/webhook', (req, res) => {
 	res.sendStatus(200)
 })
 
-// Подключение обработчиков сообщений
-require('./handlers/handlers.js') // Убедитесь, что обработчики подключены
-
+require('./handlers/handlers.js')
 require('./utils/energyRegen/energyRegen.js')
 require('./utils/checkActiveBoost/checkActiveBoost.js')
+require('./utils/miningCoins/miningCoins.js')
 
 const PORT = process.env.PORT || 5000
 
