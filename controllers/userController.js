@@ -14,7 +14,7 @@ const getUser = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-	const { telegramId, energy, soldoTaps, zecchinoTaps } = req.body
+	const { telegramId, touches } = req.body
 
 	try {
 		let user = await User.findOne({ telegramId })
@@ -23,7 +23,7 @@ const updateUser = async (req, res) => {
 			return res.status(404).json({ message: 'User not found' })
 		}
 
-		if (soldoTaps !== undefined) {
+		if (user.stage === 1) {
 			if (
 				user.boosts &&
 				user.boosts.length > 0 &&
@@ -31,12 +31,12 @@ const updateUser = async (req, res) => {
 			) {
 				user.soldoTaps += user.upgradeBoosts[2].level * 10
 			} else {
-				user.soldoTaps = soldoTaps
+				user.soldoTaps = user
 			}
 			updateStageBasedOnCurrency(user)
 		}
 
-		if (zecchinoTaps !== undefined) {
+		if (user.stage === 2) {
 			if (
 				user.boosts &&
 				user.boosts.length > 0 &&
@@ -49,9 +49,7 @@ const updateUser = async (req, res) => {
 			updateStageBasedOnCurrency(user)
 		}
 
-		if (energy !== undefined) {
-			user.energy = energy
-		}
+		user.energy -= touches * user.upgradeBoosts[2].level
 		await user.save()
 
 		res.json(user)
