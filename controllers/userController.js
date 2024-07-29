@@ -50,8 +50,8 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
 	const { telegramId, touches } = req.body
-
 	try {
+		console.log(`Touches: ${touches}`)
 		let user = await User.findOne({ telegramId })
 
 		if (!user) {
@@ -88,7 +88,6 @@ const updateUser = async (req, res) => {
 		if (!statistic) {
 			statistic = new Statistic()
 		}
-
 		statistic.allTouchers += touches
 		user.energy -= touches * user.upgradeBoosts[2].level
 		console.log(user.upgradeBoosts[2].level)
