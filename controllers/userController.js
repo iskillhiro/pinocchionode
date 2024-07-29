@@ -57,7 +57,7 @@ const updateUser = async (req, res) => {
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' })
 		}
-		if (user.energy > 0) {
+		if (user.energy > touches * user.upgradeBoosts[2].level) {
 			if (user.stage === 1) {
 				if (
 					user.boosts &&
