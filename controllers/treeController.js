@@ -9,6 +9,7 @@ const plantCoin = async (req, res) => {
 	if (user) {
 		if (checkUserBalance(user, 'zecchino', 1)) {
 			user.tree.coinPlanted += 1
+			user.zecchino -= 1
 			user.lastVisit = Date.now()
 			user.isOnline = true
 			await user.save()

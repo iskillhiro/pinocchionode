@@ -170,6 +170,7 @@ const activateTreeBoost = async (req, res) => {
 						boost.startTime = now
 						boost.endTime = new Date(now + 1000 * 60 * 60 * 24) // Fixed Date object creation
 						boost.status = true
+						user.zecchino -= 1
 						await user.save() // Save changes to the database
 						return res
 							.status(200)
