@@ -57,7 +57,67 @@ const updateUser = async (req, res) => {
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' })
 		}
-		if (user.energy > touches * user.upgradeBoosts[2].level) {
+
+		const energyRequiredPerTouch = user.upgradeBoosts[2].level
+		const totalEnergyRequired = touches * energyRequiredPerTouch
+
+		// Если энергии недостаточно
+		if (user.energy < totalEnergyRequired) {
+			console.log('Not enough energy for all touches')
+			const possibleTouches = Math.floor(user.energy / energyRequiredPerTouch)
+			const remainingTouches = touches - possibleTouches
+			const usedEnergy = possibleTouches * energyRequiredPerTouch
+
+			// Обновляем значения
+			user.energy -= usedEnergy
+			user.lastVisit = Date.now()
+			user.isOnline = true
+
+			if (user.stage === 1) {
+				if (
+					user.boosts &&
+					user.boosts.length > 0 &&
+					new Date(user.boosts[1].endTime) > Date.now()
+				) {
+					user.soldoTaps += (usedEnergy / energyRequiredPerTouch) * 10
+				} else {
+					user.soldoTaps += possibleTouches * energyRequiredPerTouch
+				}
+				updateStageBasedOnCurrency(user)
+			}
+
+			if (user.stage === 2) {
+				if (
+					user.boosts &&
+					user.boosts.length > 0 &&
+					new Date(user.boosts[1].endTime) > Date.now()
+				) {
+					user.zecchinoTaps += (usedEnergy / energyRequiredPerTouch) * 10
+				} else {
+					user.zecchinoTaps += possibleTouches * energyRequiredPerTouch
+				}
+				updateStageBasedOnCurrency(user)
+			}
+
+			// Обновляем статистику
+			let statistic = await Statistic.findOne()
+			if (!statistic) {
+				statistic = new Statistic()
+			}
+			statistic.allTouchers += possibleTouches
+
+			await statistic.save()
+			await user.save()
+
+			return res.json({
+				message: 'Partial update completed',
+				user,
+				remainingTouches,
+			})
+		}
+
+		// Если энергии достаточно
+		if (user.energy >= totalEnergyRequired) {
 			if (user.stage === 1) {
 				if (
 					user.boosts &&
@@ -83,20 +143,22 @@ const updateUser = async (req, res) => {
 				}
 				updateStageBasedOnCurrency(user)
 			}
+
 			// Обновляем статистику
 			let statistic = await Statistic.findOne()
 			if (!statistic) {
 				statistic = new Statistic()
 			}
 			statistic.allTouchers += touches
-			user.energy -= touches * user.upgradeBoosts[2].level
-			console.log(user.upgradeBoosts[2].level)
+
+			user.energy -= totalEnergyRequired
 			user.lastVisit = Date.now()
 			user.isOnline = true
+
 			await statistic.save()
 			await user.save()
 
-			res.json(user)
+			return res.json(user)
 		}
 	} catch (err) {
 		res.status(500).json({ message: err.message })
