@@ -120,10 +120,10 @@ const upgradeBoost = async (req, res) => {
 					user.isOnline = true
 
 					// Вычитаем средства
-					if (currencyType === 'soldo') {
-						user.soldo -= cost
-					} else {
-						user.zecchino -= cost
+					if (currencyType === 'soldoTaps') {
+						user.soldoTaps -= cost
+					} else if (currencyType === 'zecchinoTaps') {
+						user.zecchinoTaps -= cost
 					}
 
 					await user.save()
