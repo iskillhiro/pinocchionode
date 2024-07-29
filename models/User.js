@@ -133,6 +133,12 @@ const InviterSchema = new mongoose.Schema({
 		default: null,
 	},
 })
+const RobotSchema = new mongoose.Schema({
+	isActive: { type: Boolean, default: false },
+	miningBalance: { type: Number, default: 0 },
+	startMiningDate: { type: Date, default: null },
+	endMiningDate: { type: Date, default: null },
+})
 const UserSchema = new mongoose.Schema({
 	telegramId: { type: String, required: true, unique: true },
 	username: { type: String, required: true },
@@ -149,9 +155,12 @@ const UserSchema = new mongoose.Schema({
 	boosts: [UserBoostSchema],
 	upgradeBoosts: [UpgradeBoosts],
 	tree: TreeSchema,
+	robot: RobotSchema,
 	treeCoinBoosts: [TreeCoinBoosts],
 	inviter: [InviterSchema],
 	referrals: [ReferralSchema],
+	isOnline: { type: Boolean, default: false },
+	lastVisit: { type: Date, default: Date.now() },
 	createdAt: { type: Date, default: Date.now },
 })
 

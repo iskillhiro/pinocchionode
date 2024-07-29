@@ -8,7 +8,9 @@ const getUserTasks = async (req, res) => {
 		if (!user) {
 			return res.status(404).json({ error: 'User not found' })
 		}
-
+		user.lastVisit = Date.now()
+		user.isOnline = true
+		await user.save()
 		// Фильтруем задачи на наличие хотя бы одной невыполненной задачи в блоке
 		const filteredIncompleteTasks = user.tasks.filter(taskBlock =>
 			taskBlock.tasksBlock.some(task => !task.isComplete)
@@ -55,7 +57,8 @@ const setCompleteTask = async (req, res) => {
 		if (!taskFound) {
 			return res.status(404).json({ error: 'Task not found' })
 		}
-
+		user.lastVisit = Date.now()
+		user.isOnline = true
 		await user.save()
 
 		res.status(200).json({ message: 'Task completed successfully' })

@@ -80,6 +80,7 @@ bot.on('message', async msg => {
 						name: 'auto',
 						icon: 'robot.svg',
 						boostType: 'upgradable',
+						level: 0,
 						maxLevel: 3,
 						currency: 'soldo',
 					},
@@ -128,6 +129,7 @@ bot.on('message', async msg => {
 						landingStartDate: null,
 						landingEndDate: null,
 					},
+					robot: {},
 				})
 
 				if (refId && refId !== telegramId) {

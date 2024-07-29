@@ -1,14 +1,49 @@
+const { default: mongoose } = require('mongoose')
+const Statistic = require('../models/Statistic')
 const User = require('../models/User')
 const {
 	updateStageBasedOnCurrency,
 } = require('../utils/updateStage/updateStage')
+
 // Маршрут для получения данных пользователя
 const getUser = async (req, res) => {
+	const telegramId = req.params.telegramId // Получаем telegramId из параметров запроса
+	const session = await mongoose.startSession()
+	session.startTransaction()
 	try {
-		const user = await User.findOne({ telegramId: req.params.telegramId })
-		if (!user) return res.status(404).json({ message: 'User not found' })
+		const user = await User.findOne({ telegramId }).session(session)
+		if (!user) {
+			await session.abortTransaction()
+			session.endSession()
+			return res.status(404).json({ message: 'User not found' })
+		}
+
+		// Обновляем статистику
+		console.log(telegramId) // Используем переменную telegramId
+		let statistic = await Statistic.findOne().session(session)
+		if (!statistic) {
+			statistic = new Statistic()
+		}
+
+		// Проверяем, есть ли пользователь в списке dailyUsers
+		const userExists = statistic.dailyUsers.some(
+			user => user.statUserId === telegramId
+		)
+		if (!userExists) {
+			statistic.dailyUsers.push({ statUserId: telegramId })
+		}
+
+		await statistic.save()
+		await session.commitTransaction()
+		session.endSession()
+
+		user.lastVisit = Date.now()
+		user.isOnline = true
+		await user.save() // Сохраняем изменения в пользователе
 		res.json(user)
 	} catch (err) {
+		await session.abortTransaction()
+		session.endSession()
 		res.status(500).json({ message: err.message })
 	}
 }
@@ -48,9 +83,18 @@ const updateUser = async (req, res) => {
 			}
 			updateStageBasedOnCurrency(user)
 		}
+		// Обновляем статистику
+		let statistic = await Statistic.findOne()
+		if (!statistic) {
+			statistic = new Statistic()
+		}
 
+		statistic.allTouchers += touches
 		user.energy -= touches * user.upgradeBoosts[2].level
 		console.log(user.upgradeBoosts[2].level)
+		user.lastVisit = Date.now()
+		user.isOnline = true
+		await statistic.save()
 		await user.save()
 
 		res.json(user)

@@ -31,7 +31,6 @@ const miningCoins = async () => {
 
 				// Сохраните изменения в базе данных
 				await user.save()
-				console.log(`Added ${coinsToAdd} coins to user ${user.username}`)
 			}
 		}
 	} catch (error) {

@@ -4,14 +4,13 @@ async function getBoosts(req, res) {
 	const telegramId = req.params.telegramId
 
 	try {
-		const userData = await User.find({ telegramId }).lean() // Use .lean() to return plain objects
+		const userData = await User.find({ telegramId }).lean()
 
 		if (!userData) {
 			return res.status(404).json({
 				error: 'User not found',
 			})
 		}
-
 		return res.json({ success: true, userData })
 	} catch (error) {
 		return res.status(500).json({
@@ -62,6 +61,8 @@ async function addUserBoost(req, res) {
 	userBoost.usesToday += 1
 	userBoost.startTime = now
 	userBoost.endTime = new Date(now.getTime() + (1 * 60 * 60 * 1000) / 2) // 30 min
+	user.lastVisit = Date.now()
+	user.isOnline = true
 
 	await user.save()
 	return res.json({ success: true, userBoost })
@@ -90,6 +91,8 @@ const upgradeBoost = async (req, res) => {
 			}
 
 			if (isUpdate) {
+				user.lastVisit = Date.now()
+				user.isOnline = true
 				await user.save()
 				res.status(200).json({
 					message: `Boost ${boost.name} successful upgrade`,
@@ -117,6 +120,8 @@ const activateTreeBoost = async (req, res) => {
 
 		const user = await User.findOne({ telegramId }) // Await the promise
 		if (user) {
+			user.lastVisit = Date.now()
+			user.isOnline = true
 			console.log(user.treeCoinBoosts)
 			const boost = user.treeCoinBoosts.find(boost => boost.name === boostName) // Use correct method to find the boost
 			if (boost) {
@@ -147,9 +152,34 @@ const activateTreeBoost = async (req, res) => {
 		return res.status(500).send({ success: false, message: 'Server error' })
 	}
 }
+const robotClaim = async (req, res) => {
+	const telegramId = req.params.telegramId
+	const user = await User.findOne({ telegramId }) // Await the promise
+
+	if (user) {
+		user.robot.isActive = false
+		user.stage === 1
+			? (user.soldoTaps += user.robot.miningBalance)
+			: (user.zecchinoTaps += user.robot.miningBalance)
+
+		user.robot.endMiningDate = null
+		user.robot.startMiningDate = null
+		user.robot.miningBalance = 0
+
+		await user.save()
+		res.status(200).json({
+			message: 'Successful claim',
+		})
+	} else {
+		res.status(404).json({
+			message: 'User not found',
+		})
+	}
+}
 module.exports = {
 	addUserBoost,
 	getBoosts,
 	upgradeBoost,
 	activateTreeBoost,
+	robotClaim,
 }
