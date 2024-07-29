@@ -1,4 +1,4 @@
-export function checkUserBalance(user, currency, amount) {
+function checkUserBalance(user, currency, amount) {
 	switch (currency) {
 		case 'soldo':
 			return user.soldo >= amount ? true : false
@@ -13,4 +13,7 @@ export function checkUserBalance(user, currency, amount) {
 		default:
 			return false
 	}
+}
+module.exports = {
+	checkUserBalance,
 }
