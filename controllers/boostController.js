@@ -78,54 +78,78 @@ const upgradeBoost = async (req, res) => {
 	const user = await User.findOne({ telegramId })
 
 	if (user) {
-		// Assuming user.upgradeBoosts is an array
+		// Убедимся, что user.upgradeBoosts - это массив
+		if (!Array.isArray(user.upgradeBoosts)) {
+			return res.status(500).json({
+				message: 'Upgrade boosts data is corrupted',
+			})
+		}
+
+		// Найдем буст по имени
 		const boost = user.upgradeBoosts.find(boost => boost.name === name)
 
 		if (boost) {
-			if (
-				checkUserBalance(
-					user,
-					user.stage === 1 ? 'soldo' : 'zecchino',
-					boost.level * 10000
-				)
-			) {
-				if (!(boost.level + 1 > boost.maxLevel)) {
+			const currencyType = user.stage === 1 ? 'soldoTaps' : 'zecchinoTaps'
+			const cost = boost.level * 10000
+
+			console.log(`User ${telegramId} balance check:`)
+			console.log(`Currency type: ${currencyType}`)
+			console.log(`User balance: ${user[currencyType]}`)
+			console.log(`Required cost: ${cost}`)
+
+			// Проверяем баланс
+			if (checkUserBalance(user, currencyType, cost)) {
+				if (boost.level + 1 <= boost.maxLevel) {
 					if (boost.boostType === 'daily') {
 						const dailyBoost = user.boosts.find(boost => boost.name === name)
-						dailyBoost.level += 1
+						if (dailyBoost) {
+							dailyBoost.level += 1
+						}
 					}
+
 					boost.level += 1
 					isUpdate = true
+				} else {
+					return res.status(400).json({
+						message: `Boost ${boost.name} cannot be upgraded further`,
+					})
 				}
 
 				if (isUpdate) {
 					user.lastVisit = Date.now()
 					user.isOnline = true
+
+					// Вычитаем средства
+					if (currencyType === 'soldo') {
+						user.soldo -= cost
+					} else {
+						user.zecchino -= cost
+					}
+
 					await user.save()
-					res.status(200).json({
+					return res.status(200).json({
 						message: `Boost ${boost.name} successful upgrade`,
-					})
-				} else {
-					res.status(400).json({
-						message: `Boost ${boost.name} cannot be upgraded further`,
 					})
 				}
 			} else {
+				// Логируем информацию о недостатке средств
+				console.log('Insufficient funds for upgrade boost')
 				return res.status(423).json({
 					message: 'Insufficient funds for upgrade boost',
 				})
 			}
 		} else {
-			res.status(404).json({
+			return res.status(404).json({
 				message: `Boost with name ${name} not found`,
 			})
 		}
 	} else {
-		res.status(404).json({
+		return res.status(404).json({
 			message: 'User not found',
 		})
 	}
 }
+
 const activateTreeBoost = async (req, res) => {
 	try {
 		const telegramId = req.params.telegramId
