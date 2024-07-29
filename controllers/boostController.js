@@ -1,7 +1,5 @@
 const User = require('../models/User')
-const {
-	checkUserBalance,
-} = require('../utils/checkUserBalance/checkUserBalance')
+const checkUserBalance = require('../utils/checkUserBalance/checkUserBalance')
 
 async function getBoosts(req, res) {
 	const telegramId = req.params.telegramId
