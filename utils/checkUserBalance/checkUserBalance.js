@@ -1,19 +1,20 @@
 function checkUserBalance(user, currency, amount) {
+	if (typeof amount !== 'number' || amount <= 0) {
+		return false
+	}
+
 	switch (currency) {
 		case 'soldo':
-			return user.soldo >= amount ? true : false
+			return user.soldo >= amount
 		case 'soldoTaps':
-			return user.soldoTaps >= amount ? true : false
+			return user.soldoTaps >= amount
 		case 'zecchino':
-			return user.zecchino >= amount ? true : false
+			return user.zecchino >= amount
 		case 'zecchinoTaps':
-			return user.zecchinoTaps >= amount ? true : false
+			return user.zecchinoTaps >= amount
 		case 'coins':
-			return user.coins >= amount ? true : false
+			return user.coins >= amount
 		default:
 			return false
 	}
-}
-module.exports = {
-	checkUserBalance,
 }

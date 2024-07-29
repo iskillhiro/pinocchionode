@@ -114,7 +114,7 @@ const upgradeBoost = async (req, res) => {
 				}
 			} else {
 				return res.status(423).json({
-					message: 'Insufficient funds',
+					message: 'Insufficient funds for upgrade boost',
 				})
 			}
 		} else {
@@ -164,7 +164,7 @@ const activateTreeBoost = async (req, res) => {
 				}
 			} else {
 				return res.status(423).json({
-					message: 'Insufficient funds',
+					message: 'Insufficient funds for activate tree boost',
 				})
 			}
 		} else {

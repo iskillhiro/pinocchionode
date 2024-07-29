@@ -19,7 +19,7 @@ const plantCoin = async (req, res) => {
 			})
 		} else {
 			return res.status(423).json({
-				message: 'Insufficient funds',
+				message: 'Insufficient funds for plant coin',
 			})
 		}
 	}
