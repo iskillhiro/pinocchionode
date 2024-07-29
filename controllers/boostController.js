@@ -1,4 +1,7 @@
 const User = require('../models/User')
+const {
+	checkUserBalance,
+} = require('../utils/checkUserBalance/checkUserBalance')
 
 async function getBoosts(req, res) {
 	const telegramId = req.params.telegramId
@@ -81,25 +84,37 @@ const upgradeBoost = async (req, res) => {
 		const boost = user.upgradeBoosts.find(boost => boost.name === name)
 
 		if (boost) {
-			if (!(boost.level + 1 > boost.maxLevel)) {
-				if (boost.boostType === 'daily') {
-					const dailyBoost = user.boosts.find(boost => boost.name === name)
-					dailyBoost.level += 1
+			if (
+				checkUserBalance(
+					user,
+					user.stage === 1 ? 'soldo' : 'zecchino',
+					boost.level * 10000
+				)
+			) {
+				if (!(boost.level + 1 > boost.maxLevel)) {
+					if (boost.boostType === 'daily') {
+						const dailyBoost = user.boosts.find(boost => boost.name === name)
+						dailyBoost.level += 1
+					}
+					boost.level += 1
+					isUpdate = true
 				}
-				boost.level += 1
-				isUpdate = true
-			}
 
-			if (isUpdate) {
-				user.lastVisit = Date.now()
-				user.isOnline = true
-				await user.save()
-				res.status(200).json({
-					message: `Boost ${boost.name} successful upgrade`,
-				})
+				if (isUpdate) {
+					user.lastVisit = Date.now()
+					user.isOnline = true
+					await user.save()
+					res.status(200).json({
+						message: `Boost ${boost.name} successful upgrade`,
+					})
+				} else {
+					res.status(400).json({
+						message: `Boost ${boost.name} cannot be upgraded further`,
+					})
+				}
 			} else {
-				res.status(400).json({
-					message: `Boost ${boost.name} cannot be upgraded further`,
+				return res.status(423).json({
+					message: 'Insufficient funds',
 				})
 			}
 		} else {
@@ -120,29 +135,37 @@ const activateTreeBoost = async (req, res) => {
 
 		const user = await User.findOne({ telegramId }) // Await the promise
 		if (user) {
-			user.lastVisit = Date.now()
-			user.isOnline = true
-			console.log(user.treeCoinBoosts)
-			const boost = user.treeCoinBoosts.find(boost => boost.name === boostName) // Use correct method to find the boost
-			if (boost) {
-				if (boost.status === false) {
-					const now = Date.now()
-					boost.startTime = now
-					boost.endTime = new Date(now + 1000 * 60 * 60 * 24) // Fixed Date object creation
-					boost.status = true
-					await user.save() // Save changes to the database
-					return res
-						.status(200)
-						.send({ success: true, message: 'Boost activated successfully' })
+			if (checkUserBalance(user, 'zecchino', 1)) {
+				user.lastVisit = Date.now()
+				user.isOnline = true
+				console.log(user.treeCoinBoosts)
+				const boost = user.treeCoinBoosts.find(
+					boost => boost.name === boostName
+				) // Use correct method to find the boost
+				if (boost) {
+					if (boost.status === false) {
+						const now = Date.now()
+						boost.startTime = now
+						boost.endTime = new Date(now + 1000 * 60 * 60 * 24) // Fixed Date object creation
+						boost.status = true
+						await user.save() // Save changes to the database
+						return res
+							.status(200)
+							.send({ success: true, message: 'Boost activated successfully' })
+					} else {
+						return res
+							.status(400)
+							.send({ success: false, message: 'Boost is already active' })
+					}
 				} else {
 					return res
-						.status(400)
-						.send({ success: false, message: 'Boost is already active' })
+						.status(404)
+						.send({ success: false, message: 'Boost not found' })
 				}
 			} else {
-				return res
-					.status(404)
-					.send({ success: false, message: 'Boost not found' })
+				return res.status(423).json({
+					message: 'Insufficient funds',
+				})
 			}
 		} else {
 			return res.status(404).send({ success: false, message: 'User not found' })

@@ -1,4 +1,7 @@
 const User = require('../models/User')
+const {
+	checkUserBalance,
+} = require('../utils/checkUserBalance/checkUserBalance')
 
 const plantCoin = async (req, res) => {
 	const telegramId = req.body.telegramId
@@ -6,15 +9,19 @@ const plantCoin = async (req, res) => {
 	const user = await User.findOne({ telegramId })
 
 	if (user) {
-		// TODO: внедрить проверку баланса коинов
-
-		user.tree.coinPlanted += 1
-		user.lastVisit = Date.now()
-		user.isOnline = true
-		await user.save()
-		res.status(200).json({
-			message: 'Successful plant',
-		})
+		if (checkUserBalance(user, 'zecchino', 1)) {
+			user.tree.coinPlanted += 1
+			user.lastVisit = Date.now()
+			user.isOnline = true
+			await user.save()
+			res.status(200).json({
+				message: 'Successful plant',
+			})
+		} else {
+			return res.status(423).json({
+				message: 'Insufficient funds',
+			})
+		}
 	}
 }
 const startLanding = async (req, res) => {
