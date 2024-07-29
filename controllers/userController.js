@@ -57,46 +57,47 @@ const updateUser = async (req, res) => {
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' })
 		}
-
-		if (user.stage === 1) {
-			if (
-				user.boosts &&
-				user.boosts.length > 0 &&
-				new Date(user.boosts[1].endTime) > Date.now()
-			) {
-				user.soldoTaps += user.upgradeBoosts[2].level * 10
-			} else {
-				user.soldoTaps += touches * user.upgradeBoosts[2].level
+		if (user.energy > 0) {
+			if (user.stage === 1) {
+				if (
+					user.boosts &&
+					user.boosts.length > 0 &&
+					new Date(user.boosts[1].endTime) > Date.now()
+				) {
+					user.soldoTaps += user.upgradeBoosts[2].level * 10
+				} else {
+					user.soldoTaps += touches * user.upgradeBoosts[2].level
+				}
+				updateStageBasedOnCurrency(user)
 			}
-			updateStageBasedOnCurrency(user)
-		}
 
-		if (user.stage === 2) {
-			if (
-				user.boosts &&
-				user.boosts.length > 0 &&
-				new Date(user.boosts[1].endTime) > Date.now()
-			) {
-				user.zecchinoTaps += user.upgradeBoosts[2].level * 10
-			} else {
-				user.zecchinoTaps += touches * user.upgradeBoosts[2].level
+			if (user.stage === 2) {
+				if (
+					user.boosts &&
+					user.boosts.length > 0 &&
+					new Date(user.boosts[1].endTime) > Date.now()
+				) {
+					user.zecchinoTaps += user.upgradeBoosts[2].level * 10
+				} else {
+					user.zecchinoTaps += touches * user.upgradeBoosts[2].level
+				}
+				updateStageBasedOnCurrency(user)
 			}
-			updateStageBasedOnCurrency(user)
-		}
-		// Обновляем статистику
-		let statistic = await Statistic.findOne()
-		if (!statistic) {
-			statistic = new Statistic()
-		}
-		statistic.allTouchers += touches
-		user.energy -= touches * user.upgradeBoosts[2].level
-		console.log(user.upgradeBoosts[2].level)
-		user.lastVisit = Date.now()
-		user.isOnline = true
-		await statistic.save()
-		await user.save()
+			// Обновляем статистику
+			let statistic = await Statistic.findOne()
+			if (!statistic) {
+				statistic = new Statistic()
+			}
+			statistic.allTouchers += touches
+			user.energy -= touches * user.upgradeBoosts[2].level
+			console.log(user.upgradeBoosts[2].level)
+			user.lastVisit = Date.now()
+			user.isOnline = true
+			await statistic.save()
+			await user.save()
 
-		res.json(user)
+			res.json(user)
+		}
 	} catch (err) {
 		res.status(500).json({ message: err.message })
 	}
