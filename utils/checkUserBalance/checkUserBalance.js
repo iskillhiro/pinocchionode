@@ -18,3 +18,4 @@ function checkUserBalance(user, currency, amount) {
 			return false
 	}
 }
+module.exports = checkUserBalance
