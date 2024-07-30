@@ -61,49 +61,27 @@ const updateUser = async (req, res) => {
 		const energyRequiredPerTouch = user.upgradeBoosts[2].level
 		const totalEnergyRequired = touches * energyRequiredPerTouch
 
-		// Если энергии недостаточно
+		// If energy is insufficient
 		if (user.energy < totalEnergyRequired) {
-			console.log('Not enough energy for all touches')
 			const possibleTouches = Math.floor(user.energy / energyRequiredPerTouch)
 			const remainingTouches = touches - possibleTouches
 			const usedEnergy = possibleTouches * energyRequiredPerTouch
 
-			// Обновляем значения
+			// Update user values
 			user.energy -= usedEnergy
 			user.lastVisit = Date.now()
 			user.isOnline = true
 
 			if (user.stage === 1) {
-				if (
-					user.boosts &&
-					user.boosts.length > 0 &&
-					new Date(user.boosts[1].endTime) > Date.now()
-				) {
-					user.soldoTaps += (usedEnergy / energyRequiredPerTouch) * 10
-				} else {
-					user.soldoTaps += possibleTouches * energyRequiredPerTouch
-				}
+				user.soldoTaps += calculateTaps(user, possibleTouches)
+				updateStageBasedOnCurrency(user)
+			} else if (user.stage === 2) {
+				user.zecchinoTaps += calculateTaps(user, possibleTouches)
 				updateStageBasedOnCurrency(user)
 			}
 
-			if (user.stage === 2) {
-				if (
-					user.boosts &&
-					user.boosts.length > 0 &&
-					new Date(user.boosts[1].endTime) > Date.now()
-				) {
-					user.zecchinoTaps += (usedEnergy / energyRequiredPerTouch) * 10
-				} else {
-					user.zecchinoTaps += possibleTouches * energyRequiredPerTouch
-				}
-				updateStageBasedOnCurrency(user)
-			}
-
-			// Обновляем статистику
-			let statistic = await Statistic.findOne()
-			if (!statistic) {
-				statistic = new Statistic()
-			}
+			// Update statistics
+			let statistic = (await Statistic.findOne()) || new Statistic()
 			statistic.allTouchers += possibleTouches
 
 			await statistic.save()
@@ -116,39 +94,18 @@ const updateUser = async (req, res) => {
 			})
 		}
 
-		// Если энергии достаточно
+		// If energy is sufficient
 		if (user.energy >= totalEnergyRequired) {
 			if (user.stage === 1) {
-				if (
-					user.boosts &&
-					user.boosts.length > 0 &&
-					new Date(user.boosts[1].endTime) > Date.now()
-				) {
-					user.soldoTaps += user.upgradeBoosts[2].level * 10
-				} else {
-					user.soldoTaps += touches * user.upgradeBoosts[2].level
-				}
+				user.soldoTaps += calculateTaps(user, touches)
+				updateStageBasedOnCurrency(user)
+			} else if (user.stage === 2) {
+				user.zecchinoTaps += calculateTaps(user, touches)
 				updateStageBasedOnCurrency(user)
 			}
 
-			if (user.stage === 2) {
-				if (
-					user.boosts &&
-					user.boosts.length > 0 &&
-					new Date(user.boosts[1].endTime) > Date.now()
-				) {
-					user.zecchinoTaps += user.upgradeBoosts[2].level * 10
-				} else {
-					user.zecchinoTaps += touches * user.upgradeBoosts[2].level
-				}
-				updateStageBasedOnCurrency(user)
-			}
-
-			// Обновляем статистику
-			let statistic = await Statistic.findOne()
-			if (!statistic) {
-				statistic = new Statistic()
-			}
+			// Update statistics
+			let statistic = (await Statistic.findOne()) || new Statistic()
 			statistic.allTouchers += touches
 
 			user.energy -= totalEnergyRequired
@@ -162,6 +119,19 @@ const updateUser = async (req, res) => {
 		}
 	} catch (err) {
 		res.status(500).json({ message: err.message })
+	}
+}
+
+// Helper function to calculate taps
+const calculateTaps = (user, touches) => {
+	if (
+		user.boosts &&
+		user.boosts.length > 0 &&
+		new Date(user.boosts[1].endTime) > Date.now()
+	) {
+		return touches * user.upgradeBoosts[2].level * 10
+	} else {
+		return touches * user.upgradeBoosts[2].level
 	}
 }
 

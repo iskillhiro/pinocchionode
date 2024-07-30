@@ -30,7 +30,7 @@ router
 	.get('/boost/activate/:telegramId/:boostName', addUserBoost)
 	.get('/boost/:telegramId', getBoosts)
 
-router.put('/upgradeBoost/:telegramId/:boostName', upgradeBoost)
+router.put('/upgradeBoost/:telegramId/:boostName/:currency', upgradeBoost)
 router.put('/treeBoost/:telegramId/:boostName', activateTreeBoost)
 
 router

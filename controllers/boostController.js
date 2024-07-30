@@ -61,7 +61,18 @@ async function addUserBoost(req, res) {
 	userBoost.lastUsedDate = today
 	userBoost.usesToday += 1
 	userBoost.startTime = now
-	userBoost.endTime = new Date(now.getTime() + (1 * 60 * 60 * 1000) / 2) // 30 min
+
+	if (userBoost.name !== 'energy') {
+		if (userBoost.level === 1) {
+			userBoost.endTime = new Date(now.getTime() + 15 * 1000)
+		} else if (userBoost.level === 2) {
+			userBoost.endTime = new Date(now.getTime() + 20 * 1000) // 20 seconds
+		} else {
+			userBoost.endTime = new Date(now.getTime() + 30 * 1000) // 30 seconds
+		}
+	} else {
+		userBoost.endTime = new Date(now)
+	}
 	user.lastVisit = Date.now()
 	user.isOnline = true
 
@@ -93,8 +104,6 @@ const upgradeBoost = async (req, res) => {
 			const cost = boost.level * 10000
 
 			console.log(`User ${telegramId} balance check:`)
-			console.log(`Currency type: ${currencyType}`)
-			console.log(`User balance: ${user[currencyType]}`)
 			console.log(`Required cost: ${cost}`)
 
 			// Проверяем баланс
@@ -120,9 +129,9 @@ const upgradeBoost = async (req, res) => {
 					user.isOnline = true
 
 					// Вычитаем средства
-					if (currencyType === 'soldoTaps') {
+					if (currency === 'soldoTaps') {
 						user.soldoTaps -= cost
-					} else if (currencyType === 'zecchinoTaps') {
+					} else if (currency === 'zecchinoTaps') {
 						user.zecchinoTaps -= cost
 					}
 
