@@ -52,14 +52,14 @@ bot.on('message', async msg => {
 						name: 'energy',
 						icon: 'lightning.svg',
 						boostType: 'daily',
-						maxLevel: 5,
+						maxLevel: 3,
 						currency: 'soldo',
 					},
 					{
 						name: 'turbo',
 						icon: 'silver.svg',
 						boostType: 'daily',
-						maxLevel: 5,
+						maxLevel: 3,
 						currency: 'soldo',
 					},
 					{
