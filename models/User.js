@@ -149,7 +149,7 @@ const UserSchema = new mongoose.Schema({
 	soldo: { type: Number, default: 0 },
 	zecchinoTaps: { type: Number, default: 0 },
 	zecchino: { type: Number, default: 0 },
-	energy: { type: Number, default: 100 },
+	energy: { type: Number, default: 10000 },
 	maxEnergy: { type: Number, default: 10000 },
 	tasks: [TaskBlockSchema],
 	boosts: [UserBoostSchema],
