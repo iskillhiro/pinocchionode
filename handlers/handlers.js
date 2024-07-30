@@ -27,25 +27,18 @@ bot.on('message', async msg => {
 			if (!user) {
 				const defaultTasks = [
 					{
-						taskType: 'YT',
-						title: 'Watch YouTube',
-						reward: 10,
+						taskType: 'TG',
+						title: 'Join in CandFnews',
+						reward: 5000,
 						iconSrc: 'logo.jpeg',
-						link: 'https://www.youtube.com/',
+						link: 'https://t.me/CandFnews',
 					},
 					{
 						taskType: 'TG',
-						title: 'Join Telegram Group',
-						reward: 5,
+						title: 'Join in Pinocchio',
+						reward: 5000,
 						iconSrc: 'logo.jpeg',
-						link: 'https://t.me/+U_ztILf351Q1YmRi',
-					},
-					{
-						taskType: 'X',
-						title: 'Join in X',
-						reward: 20,
-						iconSrc: 'logo.jpeg',
-						link: 'https://x.com/',
+						link: 'https://t.me/pinocchiocoins',
 					},
 				]
 
