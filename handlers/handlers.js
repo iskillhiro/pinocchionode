@@ -182,7 +182,18 @@ bot.on('message', async msg => {
 			return
 		}
 
-		const caption = `Hey @${username}! It's Pinocchio! 🌟📱\n\nNow we're rolling out our Telegram mini app! Start farming points now, and who knows what cool stuff you'll snag with them soon! 🚀\n\nGot friends? Bring 'em in! The more, the merrier! 🌱\n\nRemember: Pinocchio is where growth thrives and endless opportunities bloom! 🌼`
+		// const caption = `Hey @${username}! It's Pinocchio! 🌟📱\n\nNow we're rolling out our Telegram mini app! Start farming points now, and who knows what cool stuff you'll snag with them soon! 🚀\n\nGot friends? Bring 'em in! The more, the merrier! 🌱\n\nRemember: Pinocchio is where growth thrives and endless opportunities bloom! 🌼`
+		const caption = `Hello mate! Only you can help Pinocchio collect four silver soldos and visit the puppet theatre. However, your adventures do not stop there. Pinocchio also needs to get five golden zecchinos, and only you can help him obtain them. What to do with the golden zecchinos is well known—you should plant them in the ground and pick golden Pinocchio coins from the magic tree after midnight.
+
+		For those who:
+		- Use multiple accounts
+		- Use autoclickers or other devices
+		- Use referrals dishonestly
+		- Use other dishonest methods in the game
+		
+		The game will remain just a game.
+		
+		For everyone else, we do not promise anything except Pinocchio's assistance. Remember the magic spell "krex pex fex"—it will help everyone to win the game.`
 
 		try {
 			await bot.sendPhoto(chatId, photoPath, {
