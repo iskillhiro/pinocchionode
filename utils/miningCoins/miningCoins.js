@@ -8,7 +8,7 @@ const miningCoins = async () => {
 		for (const user of users) {
 			if (
 				new Date(user.tree.landingEndDate) > Date.now() &&
-				Date.now() > new Date(user.tree.lastGettingLoot).getTime() + 10000
+				Date.now() > new Date(user.tree.lastGettingLoot).getTime() + 100000
 			) {
 				let boostsPercent = 0
 				user.treeCoinBoosts.forEach(boost => {

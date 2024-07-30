@@ -81,7 +81,8 @@ bot.on('message', async msg => {
 						icon: 'robot.svg',
 						boostType: 'upgradable',
 						level: 0,
-						maxLevel: 3,
+						maxLevel: 2,
+						// maxLevel: 3,
 						currency: 'soldo',
 					},
 					{
@@ -94,14 +95,14 @@ bot.on('message', async msg => {
 
 				const treeCoinBoosts = [
 					{
-						name: 'shovel',
-						icon: 'shovel.svg',
+						name: 'bucket',
+						icon: 'bucket.svg',
 						boostType: 'tree-coin',
 						currency: 'zecchino',
 					},
 					{
-						name: 'bucket',
-						icon: 'bucket.svg',
+						name: 'shovel',
+						icon: 'shovel.svg',
 						boostType: 'tree-coin',
 						currency: 'zecchino',
 					},
@@ -138,6 +139,12 @@ bot.on('message', async msg => {
 						user.inviter.push({
 							inviterId: refId,
 						})
+						user.soldo += 1
+						user.coinStage += 1
+						bot.sendMessage(
+							user.telegramId,
+							'Congratulations! You have received 1 Soldo coin as a reward!'
+						)
 						await addReferral(refId, telegramId, username)
 					} else {
 						console.log('Referral user not found:', refId)

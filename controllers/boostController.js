@@ -73,6 +73,7 @@ async function addUserBoost(req, res) {
 const upgradeBoost = async (req, res) => {
 	const telegramId = req.params.telegramId
 	const name = req.params.boostName
+	const currency = req.params.currency
 
 	let isUpdate = false
 	const user = await User.findOne({ telegramId })
@@ -89,7 +90,6 @@ const upgradeBoost = async (req, res) => {
 		const boost = user.upgradeBoosts.find(boost => boost.name === name)
 
 		if (boost) {
-			const currencyType = user.stage === 1 ? 'soldoTaps' : 'zecchinoTaps'
 			const cost = boost.level * 10000
 
 			console.log(`User ${telegramId} balance check:`)
@@ -98,7 +98,7 @@ const upgradeBoost = async (req, res) => {
 			console.log(`Required cost: ${cost}`)
 
 			// Проверяем баланс
-			if (checkUserBalance(user, currencyType, cost)) {
+			if (checkUserBalance(user, currency, cost)) {
 				if (boost.level + 1 <= boost.maxLevel) {
 					if (boost.boostType === 'daily') {
 						const dailyBoost = user.boosts.find(boost => boost.name === name)

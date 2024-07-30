@@ -16,7 +16,7 @@ async function updateStageBasedOnCurrency(user) {
 	) => {
 		const inviterId = user.inviter[0]?.inviterId
 
-		if (user.coinStage !== nextStageCoinStage) {
+		if (user.coinStage < nextStageCoinStage) {
 			user.coinStage += 1
 			console.log(
 				`Stage ${currentStage}, CoinStage: ${user.coinStage}. Sending ${rewardAmount} ${coinType} as reward.`
@@ -53,14 +53,18 @@ async function updateStageBasedOnCurrency(user) {
 		if (user.stage === 1) {
 			processStage(1, 'Soldo', 20000, 4)
 		} else if (user.stage === 2) {
-			processStage(2, 'Zecchino', 20000, 5)
+			processStage(2, 'Soldo', 20000, 5)
 		}
 	}
 
 	if (user.zecchinoTaps > 1000000) {
 		user.zecchinoTaps -= 1000000
-		user.soldo += 1
+		user.zecchino += 1
 		hasChanges = true
+
+		if (user.stage === 2) {
+			processStage(2, 'Zecchino', 20000, 5)
+		}
 	}
 
 	if (hasChanges) {
