@@ -107,7 +107,7 @@ const upgradeBoost = async (req, res) => {
 			console.log(`Required cost: ${cost}`)
 
 			// Проверяем баланс
-			if (checkUserBalance(user, currency, cost)) {
+			if (checkUserBalance(user, currency, cost, boost)) {
 				if (boost.level + 1 <= boost.maxLevel) {
 					if (boost.boostType === 'daily') {
 						const dailyBoost = user.boosts.find(boost => boost.name === name)

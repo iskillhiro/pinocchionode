@@ -93,6 +93,10 @@ const UpgradeBoosts = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	minPrice: {
+		type: Number,
+		default: null,
+	},
 })
 
 const TreeCoinBoosts = new mongoose.Schema({

@@ -1,7 +1,10 @@
-function checkUserBalance(user, currency, amount) {
+function checkUserBalance(user, currency, amount, boost = null) {
 	// Проверяем, что amount - положительное число
-	if (typeof amount !== 'number' || amount <= 0) {
+	if (typeof amount !== 'number') {
 		return false
+	}
+	if (boost !== null && amount === 0) {
+		amount = boost.minPrice
 	}
 
 	switch (currency) {
