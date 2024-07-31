@@ -37,4 +37,4 @@ async function resetExpiredBoostsToDefault() {
 	}
 }
 
-cron.schedule('* * * * * *', resetExpiredBoostsToDefault)
+cron.schedule('* * * * *', resetExpiredBoostsToDefault)

@@ -2,8 +2,6 @@ const User = require('../../models/User')
 const bot = require('../../bot')
 
 const addReferral = async (telegramId, referralId, username) => {
-	// TODO: Система награждения рефералам
-	// За каждую закрытую монету(сольд, цихин) или за собирание коинов с дерева будет даваться % от собранного кол-ва. !Без дробных чисел, только целые!
 	try {
 		let user = await User.findOne({ telegramId })
 
@@ -23,7 +21,7 @@ const addReferral = async (telegramId, referralId, username) => {
 				bot.sendMessage(
 					telegramId,
 					`🥳 Congratulations! @${username} has joined!
-💎You'll earn a 20% cashback every time your friend claims coins.
+💎You'll earn a cashback every time your friend claims coins.
 Invite more friends to join the fun and increase your rewards even further! 🧑‍🤝‍🧑`
 				)
 			} else {

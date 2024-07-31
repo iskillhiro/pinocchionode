@@ -6,9 +6,13 @@ const miningCoins = async () => {
 		const users = await User.find({})
 
 		for (const user of users) {
+			const now = Date.now()
+			const lastLootTime = new Date(user.tree.lastGettingLoot).getTime()
+			const oneHourInMilliseconds = 3600000
+
 			if (
-				new Date(user.tree.landingEndDate) > Date.now() &&
-				Date.now() > new Date(user.tree.lastGettingLoot).getTime() + 100000
+				new Date(user.tree.landingEndDate) > now &&
+				now > lastLootTime + oneHourInMilliseconds
 			) {
 				let boostsPercent = 0
 				user.treeCoinBoosts.forEach(boost => {
@@ -16,10 +20,9 @@ const miningCoins = async () => {
 						boostsPercent += 0.5
 					}
 				})
-				let coinsToAdd =
-					Math.floor(user.tree.coinPlanted / 24) > 0
-						? Math.floor(user.tree.coinPlanted / 24)
-						: 1
+
+				// Рассчитываем количество монет за час
+				let coinsToAdd = (user.tree.coinPlanted * 240) / 24
 
 				user.tree.lootBalance +=
 					boostsPercent > 0
@@ -38,5 +41,5 @@ const miningCoins = async () => {
 	}
 }
 
-// Периодическое выполнение задания (каждую секунду)
-cron.schedule('* * * * * *', miningCoins)
+// Периодическое выполнение задания (каждую минуту)
+cron.schedule('* * * * *', miningCoins)
