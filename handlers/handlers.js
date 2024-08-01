@@ -193,7 +193,7 @@ bot.on('message', async msg => {
 		
 		The game will remain just a game.
 		
-		For everyone else, we do not promise anything except Pinocchio's assistance. Remember the magic spell "krex pex fex"—it will help everyone to win the game.`
+		For everyone else, we do not promise anything except Pinocchio's assistance. Remember the magic spell "krex fex pex"—it will help everyone to win the game.`
 
 		try {
 			await bot.sendPhoto(chatId, photoPath, {
