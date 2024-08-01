@@ -22,11 +22,11 @@ const miningCoins = async () => {
 				})
 
 				// Рассчитываем количество монет за час
-				let coinsToAdd = (user.tree.coinPlanted * 240) / 24
+				let coinsToAdd = 240
 
 				user.tree.lootBalance +=
 					boostsPercent > 0
-						? coinsToAdd + Math.floor(boostsPercent * boostsPercent)
+						? coinsToAdd + Math.floor(coinsToAdd * boostsPercent)
 						: coinsToAdd
 
 				// Обновите lastGettingLoot на текущее время
