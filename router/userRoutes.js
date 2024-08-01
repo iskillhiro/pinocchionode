@@ -1,6 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const { getUser, updateUser } = require('../controllers/userController')
+const {
+	getUser,
+	updateUser,
+	awardUserForYears,
+} = require('../controllers/userController')
 const {
 	getUserTasks,
 	setCompleteTask,
@@ -39,6 +43,7 @@ router
 	.get('/tree/claim/:telegramId', claim)
 
 router.get('/robot/claim/:telegramId', robotClaim)
+router.get('/bonus/:telegramId/:isPremium', awardUserForYears)
 
 router.get('/statistic', getStatistic)
 module.exports = router

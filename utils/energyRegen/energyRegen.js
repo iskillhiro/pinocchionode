@@ -8,7 +8,7 @@ const energyRegen = async () => {
 		const users = await User.find({})
 
 		for (let user of users) {
-			user.energy = Math.min(user.energy + 1, user.maxEnergy) // Восстанавливаем 1 единицу энергии каждую секунду
+			user.energy = user.upgradeBoosts[2].level
 			await user.save()
 		}
 	} catch (error) {

@@ -134,8 +134,75 @@ const calculateTaps = (user, touches) => {
 		return touches * user.upgradeBoosts[2].level
 	}
 }
+const awardUserForYears = async (req, res) => {
+	const { telegramId } = req.params.telegramId
+	const { isPremium } = req.params.isPremium
+
+	try {
+		let user = await User.findOne({ telegramId })
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' })
+		}
+
+		const registration_date = getRegistrationDateV2Shift3(telegramId)
+
+		const years = yearsSinceRegistration(registration_date)
+
+		// Выдача награды
+		let reward = calculateReward(years, isPremium)
+
+		// Обновление количества soldo у пользователя
+		user.soldoTaps += reward
+
+		// Сохранение обновленных данных пользователя
+		await user.save()
+
+		res.status(200).json({
+			message: `Awarded ${reward} soldo for ${totalYears} year(s) of membership`,
+			user,
+			reward,
+		})
+	} catch (err) {
+		res.status(500).json({ message: err.message })
+	}
+}
+function calculateReward(years, isPremium) {
+	let reward
+
+	if (years >= 1 && isPremium) {
+		reward = 20000 * years * 2
+	} else {
+		reward = years * 10000 || 10000
+	}
+
+	return reward
+}
+function getRegistrationDateV2Shift3(telegramId) {
+	// Используем 3 старших бита
+	const timestampSeconds = telegramId >> 3
+
+	// Начальная дата (1 января 2016 года)
+	const startDate = new Date(Date.UTC(2016, 0, 1)) // январь - 0, февраль - 1, ...
+
+	// Вычисляем дату регистрации
+	const registrationDate = new Date(
+		startDate.getTime() + timestampSeconds * 1000
+	)
+
+	return registrationDate
+}
+
+function yearsSinceRegistration(registrationDate) {
+	const currentDate = new Date()
+	const diffTime = Math.abs(currentDate - registrationDate)
+	const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25) // Учитываем високосные годы
+
+	return diffYears
+}
 
 module.exports = {
 	getUser,
 	updateUser,
+	awardUserForYears,
 }

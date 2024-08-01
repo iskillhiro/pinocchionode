@@ -163,6 +163,7 @@ const UserSchema = new mongoose.Schema({
 	treeCoinBoosts: [TreeCoinBoosts],
 	inviter: [InviterSchema],
 	referrals: [ReferralSchema],
+	yearBonusClaimed: { type: Boolean, default: false },
 	isOnline: { type: Boolean, default: false },
 	lastVisit: { type: Date, default: Date.now() },
 	createdAt: { type: Date, default: Date.now },
