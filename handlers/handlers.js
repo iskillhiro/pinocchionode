@@ -30,14 +30,14 @@ bot.on('message', async msg => {
 						taskType: 'TG',
 						title: 'Join in CandFnews',
 						reward: 5000,
-						iconSrc: 'logo.jpeg',
+						iconSrc: 'telegram.svg',
 						link: 'https://t.me/CandFnews',
 					},
 					{
 						taskType: 'TG',
 						title: 'Join in Pinocchio',
 						reward: 5000,
-						iconSrc: 'logo.jpeg',
+						iconSrc: 'telegram.svg',
 						link: 'https://t.me/pinocchiocoins',
 					},
 				]
