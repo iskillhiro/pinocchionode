@@ -17,7 +17,7 @@ const robot = async () => {
 					user.robot.isActive = false
 					console.log(`Robot turned off for user ${user._id}`)
 				} else if (endMiningDate > now && user.robot.isActive) {
-					user.robot.miningBalance += 60
+					user.robot.miningBalance += 334
 				}
 				await user.save()
 			})
