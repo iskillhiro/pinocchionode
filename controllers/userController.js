@@ -151,6 +151,7 @@ const awardUserForYears = async (req, res) => {
 		let reward = calculateReward(years)
 
 		user.soldoTaps += reward
+		user.yearBonusClaimed = true
 
 		await user.save()
 
