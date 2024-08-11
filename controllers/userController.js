@@ -135,7 +135,7 @@ const calculateTaps = (user, touches) => {
 	}
 }
 const awardUserForYears = async (req, res) => {
-	const { telegramId } = req.params // Corrected line
+	const { telegramId } = req.params
 
 	try {
 		let user = await User.findOne({ telegramId })
@@ -146,7 +146,7 @@ const awardUserForYears = async (req, res) => {
 
 		const registration_date = getRegistrationDateV2Shift3(telegramId)
 
-		const years = yearsSinceRegistration(registration_date)
+		const years = parseInt(yearsSinceRegistration(registration_date))
 
 		let reward = calculateReward(years)
 
