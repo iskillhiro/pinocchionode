@@ -158,6 +158,7 @@ const awardUserForYears = async (req, res) => {
 			message: `Awarded ${reward} soldo for ${years} year(s) of membership`,
 			user,
 			reward,
+			years,
 		})
 	} catch (err) {
 		res.status(500).json({ message: err.message })
