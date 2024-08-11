@@ -22,6 +22,7 @@ const getUserTasks = async (req, res) => {
 				}
 			})
 		})
+		user.save()
 		return res.json({
 			user: {
 				telegramId: user.telegramId,
