@@ -43,7 +43,7 @@ router
 	.get('/tree/claim/:telegramId', claim)
 
 router.get('/robot/claim/:telegramId', robotClaim)
-router.post('/bonus/:telegramId/:isPremium', awardUserForYears)
+router.post('/bonus/:telegramId', awardUserForYears)
 
 router.get('/statistic', getStatistic)
 module.exports = router
