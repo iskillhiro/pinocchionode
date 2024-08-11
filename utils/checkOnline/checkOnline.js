@@ -13,7 +13,7 @@ const checkOnline = async () => {
 		for (const user of users) {
 			const lastVisit = new Date(user.lastVisit).getTime()
 			// Если время последнего визита больше текущего времени минус 5 минут (300000 мс)
-			if (now - lastVisit > 10000 && user.isOnline) {
+			if (now - lastVisit > 30000 && user.isOnline) {
 				user.isOnline = false
 				if (user.upgradeBoosts[3].level > 0) {
 					user.robot.isActive = true

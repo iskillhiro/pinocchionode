@@ -29,6 +29,10 @@ const TaskSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	isViewed: {
+		type: Boolean,
+		default: false,
+	},
 })
 const TaskBlockSchema = new mongoose.Schema({
 	tasksBlock: [TaskSchema],
