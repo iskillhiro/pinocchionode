@@ -136,7 +136,6 @@ const calculateTaps = (user, touches) => {
 }
 const awardUserForYears = async (req, res) => {
 	const { telegramId } = req.params.telegramId
-	const { isPremium } = req.params.isPremium
 
 	try {
 		let user = await User.findOne({ telegramId })
@@ -150,7 +149,7 @@ const awardUserForYears = async (req, res) => {
 		const years = yearsSinceRegistration(registration_date)
 
 		// Выдача награды
-		let reward = calculateReward(years, isPremium)
+		let reward = calculateReward(years)
 
 		// Обновление количества soldo у пользователя
 		user.soldoTaps += reward
@@ -167,13 +166,13 @@ const awardUserForYears = async (req, res) => {
 		res.status(500).json({ message: err.message })
 	}
 }
-function calculateReward(years, isPremium) {
+function calculateReward(years) {
 	let reward
 
-	if (years >= 1 && isPremium) {
-		reward = 20000 * years * 2
+	if (years > 1) {
+		reward = 20000 * years
 	} else {
-		reward = years * 10000 || 10000
+		reward = 10000
 	}
 
 	return reward
