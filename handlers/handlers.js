@@ -28,14 +28,14 @@ bot.on('message', async msg => {
 				const defaultTasks = [
 					{
 						taskType: 'TG',
-						title: 'Join in CandFnews',
+						title: 'Join in CANDFNEWS',
 						reward: 5000,
 						iconSrc: 'telegram.png',
 						link: 'https://t.me/CandFnews',
 					},
 					{
 						taskType: 'TG',
-						title: 'Join in Pinocchio',
+						title: 'Join in PINOCCHIO',
 						reward: 5000,
 						iconSrc: 'telegram.png',
 						link: 'https://t.me/pinocchiocoins',
