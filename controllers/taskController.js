@@ -15,8 +15,8 @@ const getUserTasks = async (req, res) => {
 		const filteredIncompleteTasks = user.tasks.filter(taskBlock =>
 			taskBlock.tasksBlock.some(task => !task.isComplete)
 		)
-		user.tasks.forEach(taskBlock => {
-			taskBlock.forEach(task => {
+		user.tasks.forEach(taskGroup => {
+			taskGroup.tasksBlock.forEach(task => {
 				if (!task.isViewed) {
 					task.isViewed = true
 				}
