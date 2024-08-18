@@ -101,7 +101,8 @@ const upgradeBoost = async (req, res) => {
 		const boost = user.upgradeBoosts.find(boost => boost.name === name)
 
 		if (boost) {
-			const cost = boost.level * 10000
+			const cost =
+				boost.name === 'auto' ? boost.level * 500000 : boost.level * 50000
 
 			console.log(`User ${telegramId} balance check:`)
 			console.log(`Required cost: ${cost}`)

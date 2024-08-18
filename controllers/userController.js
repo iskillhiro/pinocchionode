@@ -58,7 +58,7 @@ const updateUser = async (req, res) => {
 			return res.status(404).json({ message: 'User not found' })
 		}
 
-		const energyRequiredPerTouch = user.upgradeBoosts[2].level
+		const energyRequiredPerTouch = user.upgradeBoosts[2].level * 25
 		const totalEnergyRequired = touches * energyRequiredPerTouch
 
 		// If energy is insufficient
@@ -129,9 +129,9 @@ const calculateTaps = (user, touches) => {
 		user.boosts.length > 0 &&
 		new Date(user.boosts[1].endTime) > Date.now()
 	) {
-		return touches * user.upgradeBoosts[2].level * 10
+		return touches * user.upgradeBoosts[2].level * 10 * 25
 	} else {
-		return touches * user.upgradeBoosts[2].level
+		return touches * user.upgradeBoosts[2].level * 25
 	}
 }
 const awardUserForYears = async (req, res) => {
@@ -168,15 +168,19 @@ const awardUserForYears = async (req, res) => {
 
 function calculateReward(years) {
 	let reward
+	const SOLDO = 900000
 
-	if (years > 1) {
-		reward = 20000 * years
+	if (years < 1) {
+		reward = 1 * SOLDO
+	} else if (years >= 1 && years < 3) {
+		reward = 2 * SOLDO
 	} else {
-		reward = 10000
+		reward = 3 * SOLDO
 	}
 
 	return reward
 }
+
 function getRegistrationDateV2Shift3(telegramId) {
 	// Используем 3 старших бита
 	const timestampSeconds = telegramId >> 3
