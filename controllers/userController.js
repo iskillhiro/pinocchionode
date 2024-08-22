@@ -107,7 +107,14 @@ const updateUser = async (req, res) => {
 			// Update statistics
 			let statistic = (await Statistic.findOne()) || new Statistic()
 			statistic.allTouchers += touches
-
+			if (
+				user.boosts &&
+				user.boosts.length > 0 &&
+				new Date(user.boosts[1].endTime) > Date.now()
+			) {
+			} else {
+				user.energy -= totalEnergyRequired
+			}
 			user.energy -= totalEnergyRequired
 			user.lastVisit = Date.now()
 			user.isOnline = true
@@ -173,7 +180,7 @@ function calculateReward(years) {
 	if (years < 1) {
 		reward = 1 * SOLDO
 	} else if (years >= 1 && years < 3) {
-		reward = 2 * SOLDO
+		reward = 1 * SOLDO
 	} else {
 		reward = 3 * SOLDO
 	}
