@@ -164,6 +164,12 @@ bot.on('message', async msg => {
 							},
 						},
 					],
+					[
+						{
+							text: 'Manual',
+							url: 'https://pinochiowebsite.netlify.app/manual',
+						},
+					],
 				],
 			},
 		}
