@@ -156,8 +156,16 @@ const awardUserForYears = async (req, res) => {
 		const years = parseInt(yearsSinceRegistration(registration_date))
 
 		let reward = calculateReward(years)
-
-		user.soldoTaps += reward
+		if (years < 1) {
+			user.coinStage = 1
+		} else if (years >= 1 && years < 3) {
+			user.coinStage = 2
+		} else if (years >= 3 && years < 6) {
+			user.coinStage = 3
+		} else {
+			user.coinStage = 4
+		}
+		user.soldoTaps += 900000
 		user.yearBonusClaimed = true
 
 		await user.save()
@@ -175,14 +183,15 @@ const awardUserForYears = async (req, res) => {
 
 function calculateReward(years) {
 	let reward
-	const SOLDO = 900000
 
 	if (years < 1) {
-		reward = 1 * SOLDO
+		reward = 1900000
 	} else if (years >= 1 && years < 3) {
-		reward = 1 * SOLDO
+		reward = 2900000
+	} else if (years >= 3 && years < 6) {
+		reward = 3900000
 	} else {
-		reward = 3 * SOLDO
+		reward = 4900000
 	}
 
 	return reward
