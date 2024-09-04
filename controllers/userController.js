@@ -5,6 +5,40 @@ const {
 	updateStageBasedOnCurrency,
 } = require('../utils/updateStage/updateStage')
 
+// Константы для магических чисел
+const ENERGY_MULTIPLIER = 25
+const SOLDO_TAPS_BONUS = 900000
+const REWARDS = [1900000, 2900000, 3900000, 4900000]
+
+// Функция для завершения сессии с обработкой ошибок
+const endSessionWithErrorHandling = async (session, err, res) => {
+	try {
+		await session.abortTransaction()
+	} catch (abortErr) {
+		console.error('Error aborting transaction:', abortErr)
+	} finally {
+		session.endSession()
+	}
+	res.status(500).json({ message: err.message })
+}
+
+// Функция для работы со статистикой
+const updateStatistics = async (telegramId, session) => {
+	let statistic = await Statistic.findOne().session(session)
+	if (!statistic) {
+		statistic = new Statistic()
+	}
+
+	const userExists = statistic.dailyUsers.some(
+		user => user.statUserId === telegramId
+	)
+	if (!userExists) {
+		statistic.dailyUsers.push({ statUserId: telegramId })
+	}
+
+	await statistic.save()
+}
+
 // Маршрут для получения данных пользователя
 const getUser = async (req, res) => {
 	const telegramId = req.params.telegramId // Получаем telegramId из параметров запроса
@@ -18,69 +52,49 @@ const getUser = async (req, res) => {
 			return res.status(404).json({ message: 'User not found' })
 		}
 
-		// Обновляем статистику
-		console.log(telegramId) // Используем переменную telegramId
-		let statistic = await Statistic.findOne().session(session)
-		if (!statistic) {
-			statistic = new Statistic()
-		}
-
-		// Проверяем, есть ли пользователь в списке dailyUsers
-		const userExists = statistic.dailyUsers.some(
-			user => user.statUserId === telegramId
-		)
-		if (!userExists) {
-			statistic.dailyUsers.push({ statUserId: telegramId })
-		}
-
-		await statistic.save()
-		await session.commitTransaction()
-		session.endSession()
+		await updateStatistics(telegramId, session)
 
 		user.lastVisit = Date.now()
 		user.isOnline = true
 		await user.save() // Сохраняем изменения в пользователе
+
+		await session.commitTransaction()
+		session.endSession()
+
 		res.json(user)
 	} catch (err) {
-		await session.abortTransaction()
-		session.endSession()
-		res.status(500).json({ message: err.message })
+		endSessionWithErrorHandling(session, err, res)
 	}
 }
 
+// Маршрут для обновления данных пользователя
 const updateUser = async (req, res) => {
 	const { telegramId, touches } = req.body
+
+	if (!Number.isInteger(touches) || touches <= 0) {
+		return res.status(400).json({ message: 'Invalid touches value' })
+	}
+
 	try {
 		console.log(`Touches: ${touches}`)
-		let user = await User.findOne({ telegramId })
+		const user = await User.findOne({ telegramId })
 
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' })
 		}
 
-		const energyRequiredPerTouch = user.upgradeBoosts[2].level * 25
+		const energyRequiredPerTouch =
+			user.upgradeBoosts[2].level * ENERGY_MULTIPLIER
 		const totalEnergyRequired = touches * energyRequiredPerTouch
 
-		// If energy is insufficient
+		// Если недостаточно энергии
 		if (user.energy < totalEnergyRequired) {
 			const possibleTouches = Math.floor(user.energy / energyRequiredPerTouch)
 			const remainingTouches = touches - possibleTouches
 			const usedEnergy = possibleTouches * energyRequiredPerTouch
 
-			// Update user values
-			user.energy -= usedEnergy
-			user.lastVisit = Date.now()
-			user.isOnline = true
+			updateUserValues(user, possibleTouches, usedEnergy)
 
-			if (user.stage === 1) {
-				user.soldoTaps += calculateTaps(user, possibleTouches)
-				updateStageBasedOnCurrency(user)
-			} else if (user.stage === 2) {
-				user.zecchinoTaps += calculateTaps(user, possibleTouches)
-				updateStageBasedOnCurrency(user)
-			}
-
-			// Update statistics
 			let statistic = (await Statistic.findOne()) || new Statistic()
 			statistic.allTouchers += possibleTouches
 
@@ -94,82 +108,73 @@ const updateUser = async (req, res) => {
 			})
 		}
 
-		// If energy is sufficient
-		if (user.energy >= totalEnergyRequired) {
-			if (user.stage === 1) {
-				user.soldoTaps += calculateTaps(user, touches)
-				updateStageBasedOnCurrency(user)
-			} else if (user.stage === 2) {
-				user.zecchinoTaps += calculateTaps(user, touches)
-				updateStageBasedOnCurrency(user)
-			}
+		// Если энергии достаточно
+		updateUserValues(user, touches, totalEnergyRequired)
 
-			// Update statistics
-			let statistic = (await Statistic.findOne()) || new Statistic()
-			statistic.allTouchers += touches
-			if (
-				user.boosts &&
-				user.boosts.length > 0 &&
-				new Date(user.boosts[1].endTime) > Date.now()
-			) {
-			} else {
-				user.energy -= totalEnergyRequired
-			}
-			user.energy -= totalEnergyRequired
-			user.lastVisit = Date.now()
-			user.isOnline = true
+		let statistic = (await Statistic.findOne()) || new Statistic()
+		statistic.allTouchers += touches
 
-			await statistic.save()
-			await user.save()
+		await statistic.save()
+		await user.save()
 
-			return res.json(user)
-		}
+		res.json(user)
 	} catch (err) {
 		res.status(500).json({ message: err.message })
 	}
 }
 
-// Helper function to calculate taps
-const calculateTaps = (user, touches) => {
+// Вспомогательная функция для обновления значений пользователя
+const updateUserValues = (user, touches, usedEnergy) => {
+	if (user.stage === 1) {
+		user.soldoTaps += calculateTaps(user, touches)
+	} else if (user.stage === 2) {
+		user.zecchinoTaps += calculateTaps(user, touches)
+	}
+
+	updateStageBasedOnCurrency(user)
+
 	if (
+		!user.boosts ||
+		user.boosts.length === 0 ||
+		new Date(user.boosts[1]?.endTime) <= Date.now()
+	) {
+		user.energy -= usedEnergy
+	}
+
+	user.lastVisit = Date.now()
+	user.isOnline = true
+}
+
+// Вспомогательная функция для расчета тапов
+const calculateTaps = (user, touches) => {
+	const multiplier =
 		user.boosts &&
 		user.boosts.length > 0 &&
-		new Date(user.boosts[1].endTime) > Date.now()
-	) {
-		return touches * user.upgradeBoosts[2].level * 10 * 25
-	} else {
-		return touches * user.upgradeBoosts[2].level * 25
-	}
+		new Date(user.boosts[1]?.endTime) > Date.now()
+			? 10
+			: 1
+
+	return touches * user.upgradeBoosts[2].level * multiplier * ENERGY_MULTIPLIER
 }
+
+// Маршрут для награждения пользователя за годы регистрации
 const awardUserForYears = async (req, res) => {
 	const { telegramId } = req.params
 
 	try {
-		let user = await User.findOne({ telegramId })
+		const user = await User.findOne({ telegramId })
 
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' })
 		}
 
-		const registration_date = getRegistrationDateV2Shift3(telegramId)
+		const registrationDate = getRegistrationDateV2Shift3(telegramId)
+		const years = Math.floor(yearsSinceRegistration(registrationDate))
+		const reward = calculateReward(years)
 
-		const years = parseInt(yearsSinceRegistration(registration_date))
-
-		let reward = calculateReward(years)
-		if (years < 1) {
-			user.coinStage = 1
-			user.soldo = 1
-		} else if (years >= 1 && years < 3) {
-			user.coinStage = 2
-			user.soldo = 2
-		} else if (years >= 3 && years < 6) {
-			user.coinStage = 3
-			user.soldo = 3
-		} else {
-			user.coinStage = 4
-			user.soldo = 4
-		}
-		user.soldoTaps += 900000
+		user.coinStage = Math.min(4, years + 1)
+		user.soldo = Math.min(4, years + 1)
+		user.soldoTaps += SOLDO_TAPS_BONUS
 		user.yearBonusClaimed = true
 
 		await user.save()
@@ -185,43 +190,21 @@ const awardUserForYears = async (req, res) => {
 	}
 }
 
+// Вспомогательная функция для расчета награды
 function calculateReward(years) {
-	let reward
-
-	if (years < 1) {
-		reward = 1900000
-	} else if (years >= 1 && years < 3) {
-		reward = 2900000
-	} else if (years >= 3 && years < 6) {
-		reward = 3900000
-	} else {
-		reward = 4900000
-	}
-
-	return reward
+	return REWARDS[Math.min(years, REWARDS.length - 1)]
 }
 
 function getRegistrationDateV2Shift3(telegramId) {
-	// Используем 3 старших бита
 	const timestampSeconds = telegramId >> 3
-
-	// Начальная дата (1 января 2016 года)
-	const startDate = new Date(Date.UTC(2016, 0, 1)) // январь - 0, февраль - 1, ...
-
-	// Вычисляем дату регистрации
-	const registrationDate = new Date(
-		startDate.getTime() + timestampSeconds * 1000
-	)
-
-	return registrationDate
+	const startDate = new Date(Date.UTC(2016, 0, 1))
+	return new Date(startDate.getTime() + timestampSeconds * 1000)
 }
 
 function yearsSinceRegistration(registrationDate) {
 	const currentDate = new Date()
-	const diffTime = Math.abs(currentDate - registrationDate)
-	const diffYears = diffTime / (1000 * 60 * 60 * 24 * 365.25) // Учитываем високосные годы
-
-	return diffYears
+	const diffTime = currentDate - registrationDate
+	return diffTime / (1000 * 60 * 60 * 24 * 365.25)
 }
 
 module.exports = {
