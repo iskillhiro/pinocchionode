@@ -158,12 +158,16 @@ const awardUserForYears = async (req, res) => {
 		let reward = calculateReward(years)
 		if (years < 1) {
 			user.coinStage = 1
+			user.soldo = 1
 		} else if (years >= 1 && years < 3) {
 			user.coinStage = 2
+			user.soldo = 2
 		} else if (years >= 3 && years < 6) {
 			user.coinStage = 3
+			user.soldo = 3
 		} else {
 			user.coinStage = 4
+			user.soldo = 4
 		}
 		user.soldoTaps += 900000
 		user.yearBonusClaimed = true
